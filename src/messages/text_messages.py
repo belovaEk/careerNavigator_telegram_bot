@@ -15,7 +15,7 @@ class Messages:
     
     @staticmethod
     def resume() -> str:
-        return """📄 **Резюме**"""
+        return """📄 **Резюме** бла бла"""
     
     @staticmethod
     def interview() -> str:
