@@ -25,6 +25,3 @@ env/
 # OS
 .DS_Store
 Thumbs.db
-
-# Project specific (важно!)
-config.py
