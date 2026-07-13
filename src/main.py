@@ -1,21 +1,39 @@
-import telebot
-from telebot import types
-from config import config
+import sys
+import os
 
-bot = telebot.TeleBot(config.BOT_TOKEN)
+# Добавляем путь к текущей папке в sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-@bot.message_handler(commands=['start'])
-def startBot(message):
-  first_mess = f"<b>{message.from_user.first_name} </b>, привет!\nЯ твой личный карьерный ассистент в Социальном казначействе.\nДавай превратим твою учебу в первую работу.\nВыбери, чем займемся сегодня:"
-  markup = types.InlineKeyboardMarkup()
-  button_resume = types.InlineKeyboardButton(text = 'Резюме', callback_data='resume')
-  button_interview = types.InlineKeyboardButton(text = 'Собеседование', callback_data='interview')
-  button_practice = types.InlineKeyboardButton(text = 'Практика', callback_data='practice')
-  button_employment = types.InlineKeyboardButton(text = 'Трудоустройство', callback_data='employment')
-  button_questions = types.InlineKeyboardButton(text = 'Вопросы', callback_data='questions')
+# Импортируем хендлеры
+import handlers.start_handler
+import handlers.callback_handler
 
-  markup.add(button_resume, button_interview, button_practice, button_employment,button_questions)
-  bot.send_message(message.chat.id, first_mess, parse_mode='html', reply_markup=markup)
+from bot import bot
+import logging
 
-# Чтобы бот крутился вечно
-bot.infinity_polling()  
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+def main():
+    """Главная функция запуска бота"""
+    logger.info("Бот запускается...")
+    
+    try:
+        # Выводим информацию о боте
+        bot_info = bot.get_me()
+        logger.info(f"Бот @{bot_info.username} успешно запущен!")
+        logger.info(f"Имя бота: {bot_info.first_name}")
+        
+        # Запускаем бота
+        bot.infinity_polling()
+        
+    except Exception as e:
+        logger.error(f"Ошибка при запуске бота: {e}")
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
