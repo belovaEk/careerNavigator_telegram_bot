@@ -2,10 +2,15 @@ import io
 import os
 import tempfile
 
+from huggingface_hub import login
 from gradio_client import Client, handle_file
 
+from config import config
 
-# Подключаемся к публичному Space с FLUX.1 Kontext (анонимно, без токена).
+######################################################################
+login(token=config.HF_TOKEN)
+#######################################################################
+
 _client = Client("black-forest-labs/FLUX.1-Kontext-Dev")
 
 # ключ -> (текст на кнопке, промпт для модели)
@@ -29,7 +34,6 @@ def generate_career_image(photo_bytes: bytes, profession_key: str) -> io.BytesIO
     """Отправляет фото пользователя в бесплатный Space и возвращает готовое изображение в буфере."""
     _label, prompt = PROFESSIONS[profession_key]
 
-    # gradio_client ждёт путь к файлу на диске, а не сырые байты — поэтому сохраняем во временный файл
     with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
         tmp.write(photo_bytes)
         tmp_path = tmp.name
@@ -47,8 +51,6 @@ def generate_career_image(photo_bytes: bytes, profession_key: str) -> io.BytesIO
     finally:
         os.remove(tmp_path)
 
-    # В разных версиях gradio_client результат приходит либо словарём с полем "path",
-    # либо сразу строкой — путём к скачанному локально файлу. Поддерживаем оба варианта.
     result_path = result["path"] if isinstance(result, dict) else result
 
     buffer = io.BytesIO()
