@@ -35,7 +35,7 @@ class Messages:
     
     @staticmethod
     def back_to_main() -> str:
-        return "🔙 Возвращаемся в главное меню. Выберите интересующий вас раздел:"
+        return "Выберите интересующий вас раздел:"
 
 # Создаём экземпляр для удобного импорта
 messages = Messages()

@@ -21,7 +21,7 @@ def handle_callback(call):
         bot.edit_message_text(
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
-            text="🔙 Возвращаемся в главное меню. Выберите интересующий вас раздел:",
+            text="Выберите интересующий вас раздел:",
             reply_markup=get_main_keyboard()
         )
         bot.answer_callback_query(call.id)
@@ -109,10 +109,8 @@ def handle_callback(call):
         # Получаем текст сообщения
         response_text = message_map[call.data]()
 
-        # Редактируем текущее сообщение (заменяем текст и клавиатуру)
-        bot.edit_message_text(
+        bot.send_message(
             chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
             text=response_text,
             parse_mode='markdown',
             reply_markup=get_back_keyboard()
