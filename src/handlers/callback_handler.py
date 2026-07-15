@@ -3,6 +3,7 @@ import logging
 from bot import bot
 from keyboards.inline_keyboards import get_main_keyboard, get_back_keyboard
 from messages.text_messages import messages
+from gradio_client.exceptions import AppError
 
 # Импорты для примерки карьеры
 from state import user_states
@@ -52,9 +53,45 @@ def handle_callback(call):
         try:
             result_buffer = generate_career_image(state["photo_bytes"], profession_key)
             bot.send_photo(chat_id, result_buffer, caption=f"Вот ты в роли: {label} 🎉")
-        except Exception:
+
+        # Обработка ошибки превышения лимита
+        except AppError as e:
+            error_msg = str(e)
+            if "exceeded your ZeroGPU quota" in error_msg:
+                logger.warning(f"Превышена ZeroGPU квота для пользователя {chat_id}")
+                bot.send_message(
+                    chat_id,
+                    "⚠️ К сожалению, лимит генерации изображений на сегодня исчерпан.\n\n"
+                    "Пожалуйста, попробуйте позже или воспользуйтесь другими функциями бота.\n"
+                    "А пока можете изучить информацию о профессиях в главном меню! 📚"
+                )
+            else:
+                # Другие ошибки AppError
+                logger.error(f"Ошибка AppError: {error_msg}")
+                bot.send_message(
+                    chat_id,
+                    "⚠️ Произошла ошибка при генерации изображения. Попробуйте позже."
+                )
+                
+        except Exception as e:
+            # Обработка всех остальных ошибок
             logger.exception("Ошибка генерации изображения в примерке карьеры")
-            bot.send_message(chat_id, "Что-то пошло не так при генерации. Попробуй ещё раз чуть позже.")
+            error_msg = str(e)
+            if "timeout" in error_msg.lower():
+                bot.send_message(
+                    chat_id,
+                    "⏰ Превышено время ожидания. Попробуйте ещё раз или выберите другую профессию."
+                )
+            elif "connection" in error_msg.lower() or "network" in error_msg.lower():
+                bot.send_message(
+                    chat_id,
+                    "🌐 Проблемы с подключением к сервису генерации. Проверьте интернет-соединение и попробуйте позже."
+                )
+            else:
+                bot.send_message(
+                    chat_id,
+                    "❌ Что-то пошло не так при генерации. Попробуй ещё раз чуть позже."
+                )
         finally:
             user_states.pop(chat_id, None)
         return
