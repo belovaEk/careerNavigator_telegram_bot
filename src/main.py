@@ -8,9 +8,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import handlers.start_handler
 import handlers.callback_handler
 import handlers.photo_handler
+import handlers.commands_handler
+import handlers.help_handler
+import handlers.unknown_handler
 
 from bot import bot
 import logging
+from utils.bot_commands import set_bot_commands
 
 # Настройка логирования
 logging.basicConfig(
@@ -30,8 +34,13 @@ def main():
         logger.info(f"Бот @{bot_info.username} успешно запущен!")
         logger.info(f"Имя бота: {bot_info.first_name}")
 
+        set_bot_commands()
+        logger.info("Команды установлены")
+
         # Запускаем бота
         bot.infinity_polling()
+
+        
 
     except Exception as e:
         logger.error(f"Ошибка при запуске бота: {e}")
@@ -40,3 +49,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    
