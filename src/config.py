@@ -9,6 +9,7 @@ class Config:
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     BOT_NAME = os.getenv('BOT_NAME')
     HF_TOKEN = os.getenv('HF_TOKEN')
+    GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
 # Экземпляр для импорта
 config = Config()

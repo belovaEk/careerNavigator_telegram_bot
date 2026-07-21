@@ -1,4 +1,8 @@
+from pydantic_core.core_schema import none_schema
+
 from bot import bot
+
+from services.response_generator import response_func
 
 @bot.message_handler(func=lambda message: True)
 def handle_unknown_messages(message):
@@ -14,7 +18,11 @@ def handle_unknown_messages(message):
         return
     
     # Для обычных текстовых сообщений
+    bot_answer = str(response_func(message.text)) if message.text is not None else \
+    "🤔 Я понимаю только команды из меню. Нажмите /start, чтобы начать заново."
+    
     bot.reply_to(
         message,
-        "🤔 Я понимаю только команды из меню. Нажмите /start, чтобы начать заново."
+        bot_answer,
+        # "🤔 Я понимаю только команды из меню. Нажмите /start, чтобы начать заново."
     )
