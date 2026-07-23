@@ -160,7 +160,12 @@ def handle_callback(call):
 
         try:
             result_buffer = generate_career_image(state["photo_bytes"], profession_key)
-            bot.send_photo(chat_id, result_buffer, caption=f"Вот ты в роли: {label} 🎉")
+            bot.send_photo(
+            chat_id, 
+            result_buffer, 
+            caption=f"Вот ты в роли: {label} 🎉",
+            reply_markup=get_main_keyboard() 
+        )
 
         # Обработка ошибки превышения лимита
         except AppError as e:
